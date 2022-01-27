@@ -17,25 +17,41 @@ Object_repo_se_18 (southeast region for CIWS containing CI candidates using 18 k
 However, all tables share the similar structure and the only changes in the columns are the CI candidate and tracking columns depending on the thresholds. The general idea is that, each row contains the information for a single object for a given product, variable, valid, issue, lead, region and level (altitude or model level). Object_repo_se_18 columns:
 
 Src: The product name (‘CIWS’, ‘HRRR’)
+
 Datetime: Valid time (maybe should be renamed as valid)
+
 Issue: Issuance hour in integer (999 for CIWS)
+
 Lead: Lead minutes in integer (999 for CIWS)
+
 Level: Model level altitude in integer (as of now only 0 because VIL is a surface variable)
+
 Th: Threshold used to identify objects
+
 Bounds: The i,j bounds of the region showing {{x1,y1},{x2,y2}}
+
 Id: the sequential identification number for each object (unique field). This column is used in object tracking
+
 Obj_num: The number of the object in a given field (not a very important field, kinda redundant, can be deleted making sure the code is changed accordingly)
+
 Obj_ij: The i,j values of all the grid boxes that make up the object (array)
+
 Obj_cmass: The I,j values of the center of mass of the object (array)
+
 Obj_area: The area of the object
+
 Obj_mean: The mean value of the variable (VIL) values within the boundaries of the object
+
 Obj_max: The max value of the variable (VIL) values within the boundaries of the object
+
 Info: A general information column that can be populated by anything that would help
 
 The fields above are general object characteristics. Columns specifically related to CI identification and tracking are below:
 
 Ci: This is the binary column for ci candidates. It indicates the object in the specific row is a CI candidate if 1, and not if NULL. This column is for 5-min resolution. There are also similar columns, for example ci_15_18, for 15 minute, 18 km proximity threshold.
+
 Ci_evol: This is also a binary field (1 or NULL) for plotting purposes. Indicates the evolution objects as a result of tracking. If 1, they are plotted as yellow. It doesn’t indicate the CI candidate being tracked, the next column does that. So, this column is in a way redundant, the plotting can also be done using the next column.
+
 Ci_track: This is an array field to identify tracked objects using the id column. The default value of the column is an empty array so that multiple object ids can be inserted. For example, if a row has {4,25,167} in this column, it means that the object stored in this column is the continuation of three CI candidates with the ids 4, 25, and 167. This way, a single CI candidate can be queried to form get its evolution (i.e. get all objects where 4 exists in the CI_track array). This requires an index on this column using GIN in order to speed up the query. 
 
 There can be variations of both ci_evol and ci_track columns depending on the thresholds. For example, ci_evol_15_18q15: for 15 minute, 18 km previous time-step proximity, Q=15.  
